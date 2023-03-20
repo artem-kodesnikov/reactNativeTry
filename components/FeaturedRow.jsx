@@ -1,9 +1,26 @@
 import { View, Text, ScrollView } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { ArrowRightIcon } from 'react-native-heroicons/outline'
-import RestauranCard from './RestaurantCard'
+import RestaurantCard from './RestaurantCard'
+import sanityClient from '../sanity';
 
 const FeaturedRow = ({ title, description, id }) => {
+  const [restaurantCards, setRestaurantCards] = useState([]);
+
+  useEffect(() => {
+    sanityClient.fetch(`
+    *[_type == 'featured' && _id == $id] {
+      ...,
+      restaurants[] ->{
+        ...,
+        dishes[]->
+          }
+      }[0]
+    `, { id }
+    ).then(data => setRestaurantCards(data.restaurants))
+  },[])
+
+  // console.log(restaurantCards)
   return (
     <View>
       <View className='pt-4 flex-row items-center justify-between px-4'>
@@ -19,42 +36,21 @@ const FeaturedRow = ({ title, description, id }) => {
         showsHorizontalScrollIndicator={false}
         className='pt-4'
       >
-        <RestauranCard 
-          id={1}
-          imgUrl='https://ris.od.ua/wp-content/uploads/filadelfiya-s-ugrem_1-500x500.jpg'
-          title='Restaurant Card'
-          rating={4.5}
-          genre='Japanese'
-          address='123 main st '
-          shortDescription='This is a description'
-          dishes={[]}
-          long={20}
-          att={0}
-        />
-        <RestauranCard 
-          id={1}
-          imgUrl='https://ris.od.ua/wp-content/uploads/filadelfiya-s-ugrem_1-500x500.jpg'
-          title='Restaurant Card'
-          rating={4.5}
-          genre='Japanese'
-          address='123 main st '
-          shortDescription='This is a description'
-          dishes={[]}
-          long={20}
-          att={0}
-        />
-        <RestauranCard 
-          id={1}
-          imgUrl='https://ris.od.ua/wp-content/uploads/filadelfiya-s-ugrem_1-500x500.jpg'
-          title='Restaurant Card'
-          rating={4.5}
-          genre='Japanese'
-          address='123 main st '
-          shortDescription='This is a description'
-          dishes={[]}
-          long={20}
-          att={0}
-        />
+        {restaurantCards?.map(card => (
+          <RestaurantCard
+            key={card._id}
+            id={card._id}
+            imgUrl={card.image}
+            address={card.address}
+            title={card.name}
+            dishes={card.dishes}
+            rating={card.rating}
+            shortDescription={card.shord_description}
+            long={card.long}
+            att={card.att}
+            genre={card.genre}
+          />
+        ))}
       </ScrollView>
     </View>
   )
