@@ -20,7 +20,6 @@ const FeaturedRow = ({ title, description, id }) => {
     ).then(data => setRestaurantCards(data.restaurants))
   },[])
 
-  // console.log(restaurantCards)
   return (
     <View>
       <View className='pt-4 flex-row items-center justify-between px-4'>
@@ -45,7 +44,7 @@ const FeaturedRow = ({ title, description, id }) => {
             title={card.name}
             dishes={card.dishes}
             rating={card.rating}
-            shortDescription={card.shord_description}
+            shortDescription={card.short_description}
             long={card.long}
             att={card.att}
             genre={card.genre}
